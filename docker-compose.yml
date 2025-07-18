@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  mobsf:
+    image: opensecurity/mobile-security-framework-mobsf:latest
+    container_name: mobsf
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/root/.MobSF/uploads 
+    tty: true
+    stdin_open: true
+    depends_on:
+      - emulator
+    networks:
+      - mobsfnet
+    environment:
+      - MOBSF_ANALYZER_IDENTIFIER=host.docker.internal:5555
+
+  emulator:
+    image: budtmo/docker-android:emulator_11.0
+    privileged: true
+    container_name: mobsf_emulator
+    ports:
+      - "6080:6080"
+      - "5555:5555"
+    environment:
+      - DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+      - APPIUM=false
+      - AUTO_RECORD=false
+    command: ["-writable-system", "-no-snapshot", "-selinux", "permissive"]
+    networks:
+      - mobsfnet
+
+networks:
+  mobsfnet:
